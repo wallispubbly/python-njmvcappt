@@ -3,20 +3,27 @@ import re
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
-import winsound
+import sys
+import os
+import random
 
-location_arr = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114','115','116','117','118','119','120','121','122','123']
-locationname_arr = ['Lawrenceville','Bayonne','North Cape May','Camden','Cardiff','Salem','Delanco','Eatontown','SouthPlainfield','Edison','Flemington','Toms River','Freehold','Lodi','Vineland','Newark','North Bergen','Wayne','Oakland','Paterson','Thorofare','Rahway','Randolph']
-base_url_link='https://telegov.njportal.com/njmvc/AppointmentWizard/11/'
-required_months = ['March','April']
+location_arr = ['203', '202', '204', '198', '201', '207', '187', '206', '193', '194', '195', '192', '197', '186']
+locationname_arr = ['Oakland', 'Wayne', 'Paterson', 'Lodi', 'North Bergen', 'Randolph', 'Bayonne', 'Rahway', 'South Plainfield', 'Edison', 'Flemginton', 'Eatontown', 'Freehold', 'Bakers Basin']
+base_url_link='https://telegov.njportal.com/njmvc/AppointmentWizard/15/'
+required_months = ['March','April','May','June']
 
 def beep():
-    winsound.Beep(1500, 500)
-    winsound.Beep(4500, 500)
-    winsound.Beep(2500, 500)
-    winsound.Beep(1500, 500)
-    winsound.Beep(4500, 500)
-    winsound.Beep(2500, 500)
+    sys.stdout.write('\a')
+    sys.stdout.write('\a')
+    sys.stdout.write('\a')
+    sys.stdout.write('\a')
+    sys.stdout.write('\a')
+    sys.stdout.write('\a')
+
+def announce():
+    os.system('say "Found MVC appointment"')
+    os.system('say "Found MVC appointment"')
+    os.system('say "Found MVC appointment"')
 
 
 def job():
@@ -29,8 +36,10 @@ def job():
     
     for location in location_arr:
         print(location)
-        page_html = requests.get(base_url_link+location)
-        soup = BeautifulSoup(page_html.text ,'lxml')
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'}
+        page_html = requests.get(base_url_link+location, headers=headers)
+        soup = BeautifulSoup(page_html.text, features="html.parser")
         unavailable=soup.find('div',attrs={'class': 'alert-danger'})
         if unavailable is not None :
             #print('No appointments are available in '+locationname_arr[i])
@@ -44,16 +53,22 @@ def job():
                 date_string=re.sub(':', '', date_string)
                 message = 'DL Renew Dates: '+locationname_arr[i]+' / ('+location+') : '+date_string
                 print(message)
+                print(base_url_link+location)
+                announce()
                 beep()
                 found=1
         i=i+1
         
-while True :
-    try:
-        job()
-    except:
-        print("Something went wrong")
-        time.sleep(60)
-    else:
-        time.sleep(60)
+if __name__ == "__main__": 
+    while True:
+        time_to_wait = random.randint(5, 54)
+        try:
+            job()
+        except:
+            print("Something went wrong")
+            time.sleep(time_to_wait)
+        else:
+            time.sleep(time_to_wait)
+
+
     
